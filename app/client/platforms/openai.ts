@@ -84,6 +84,10 @@ export class ChatGPTApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
+    if (options.config.model.startsWith("gpt-4")) {
+      throw new Error("ChatGPT-4 is currently disabled.");
+    }
+
     const visionModel = isVisionModel(options.config.model);
     const messages = options.messages.map((v) => ({
       role: v.role,
