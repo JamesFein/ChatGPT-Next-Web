@@ -353,7 +353,7 @@ export class ChatGPTApi implements LLMApi {
       return [];
     }
 
-    return chatModels.map((m) => ({
+    return chatModels.filter((m) => !m.id.startsWith("gpt-4")).map((m) => ({
       name: m.id,
       available: true,
       provider: {
