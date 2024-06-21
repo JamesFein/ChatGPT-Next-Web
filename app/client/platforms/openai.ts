@@ -102,10 +102,6 @@ export class ChatGPTApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
-    if (options.config.model.startsWith("gpt-4")) {
-      throw new Error("ChatGPT-4 is currently disabled.");
-    }
-
     const visionModel = isVisionModel(options.config.model);
     const messages = options.messages.map((v) => ({
       role: v.role,
@@ -373,14 +369,14 @@ export class ChatGPTApi implements LLMApi {
     });
 
     const resJson = (await res.json()) as OpenAIListModelResponse;
-    const chatModels = resJson.data?.filter((m) => m.id.startsWith("gpt-3.5"));
+    const chatModels = resJson.data?.filter((m) => m.id.startsWith("gpt-"));
     console.log("[Models]", chatModels);
 
     if (!chatModels) {
       return [];
     }
 
-    return chatModels.filter((m) => !m.id.startsWith("gpt-4")).map((m) => ({
+    return chatModels.map((m) => ({
       name: m.id,
       available: true,
       provider: {
