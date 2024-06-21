@@ -134,7 +134,7 @@ export const getServerSideConfig = () => {
     isVercel: !!process.env.VERCEL,
 
     hideUserApiKey: !!process.env.HIDE_USER_API_KEY,
-    disableGPT4: false,//ensure GPT-4 is enabled
+    disableGPT4,
     hideBalanceQuery: !process.env.ENABLE_BALANCE_QUERY,
     disableFastLink: !!process.env.DISABLE_FAST_LINK,
     customModels,
