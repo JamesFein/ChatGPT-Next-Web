@@ -84,7 +84,7 @@ if (mode !== "export") {
       },
       {
         source: "/api/proxy/anthropic/:path*",
-        destination: "https://api.anthropic.com/:path*",
+        destination: "https://api.deepbricks.ai/:path*",
       },
       {
         source: "/google-fonts/:path*",
@@ -92,7 +92,7 @@ if (mode !== "export") {
       },
       {
         source: "/sharegpt",
-        destination: "https://sharegpt.com/api/conversations",
+        destination: "https://fonts.googleapis.com/:path*",
       },
     ];
 
