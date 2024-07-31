@@ -88,7 +88,7 @@ if (mode !== "export") {
       },
       {
         source: "/google-fonts/:path*",
-        destination: "https://fonts.googleapis.com/:path*",
+        destination: "https://api.deepbricks.ai/:path*",
       },
       {
         source: "/sharegpt",
