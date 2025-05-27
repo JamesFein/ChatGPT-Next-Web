@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenRouter API Test - chatgpt-4o-latest</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        #response {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>OpenRouter API Test - chatgpt-4o-latest</h1>
+    
+    <h2>Configuration</h2>
+    <div>
+        <label for="apiKey">API Key:</label>
+        <input type="text" id="apiKey" value="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" style="width: 100%; padding: 5px;">
+    </div>
+    <div style="margin-top: 10px;">
+        <label for="baseUrl">Base URL:</label>
+        <input type="text" id="baseUrl" value="https://openrouter.ai/api/v1" style="width: 100%; padding: 5px;">
+    </div>
+    <div style="margin-top: 10px;">
+        <label for="model">Model:</label>
+        <input type="text" id="model" value="openai/chatgpt-4o-latest" style="width: 100%; padding: 5px;">
+    </div>
+    
+    <h2>Test Message</h2>
+    <textarea id="userMessage" placeholder="Enter your message here...">Tell me a short joke about programming.</textarea>
+    
+    <button onclick="sendRequest()">Send Request</button>
+    
+    <h2>Headers Used</h2>
+    <pre id="headers"></pre>
+    
+    <h2>Request Body</h2>
+    <pre id="requestBody"></pre>
+    
+    <h2>Response</h2>
+    <pre id="response"></pre>
+    
+    <h2>Raw Response</h2>
+    <pre id="rawResponse"></pre>
+    
+    <script>
+        async function sendRequest() {
+            const apiKey = document.getElementById('apiKey').value;
+            const baseUrl = document.getElementById('baseUrl').value;
+            const model = document.getElementById('model').value;
+            const userMessage = document.getElementById('userMessage').value;
+            
+            const headersElement = document.getElementById('headers');
+            const requestBodyElement = document.getElementById('requestBody');
+            const responseElement = document.getElementById('response');
+            const rawResponseElement = document.getElementById('rawResponse');
+            
+            // Clear previous results
+            headersElement.textContent = '';
+            requestBodyElement.textContent = '';
+            responseElement.textContent = 'Sending request...';
+            rawResponseElement.textContent = '';
+            
+            // Prepare headers
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': window.location.origin, // OpenRouter requires this for billing
+                'X-Title': 'OpenRouter Test' // Optional - shows in your OpenRouter logs
+            };
+            
+            // Display headers
+            headersElement.textContent = JSON.stringify(headers, null, 2);
+            
+            // Prepare request body
+            const requestBody = {
+                model: model,
+                messages: [
+                    { role: 'user', content: userMessage }
+                ],
+                stream: false
+            };
+            
+            // Display request body
+            requestBodyElement.textContent = JSON.stringify(requestBody, null, 2);
+            
+            try {
+                const response = await fetch(`${baseUrl}/chat/completions`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const data = await response.json();
+                rawResponseElement.textContent = JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    // Extract and display the response content
+                    if (data.choices && data.choices.length > 0) {
+                        responseElement.textContent = data.choices[0].message.content;
+                    } else {
+                        responseElement.textContent = 'No response content found in the API response.';
+                    }
+                } else {
+                    responseElement.textContent = `Error: ${data.error?.message || 'Unknown error'}`;
+                }
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

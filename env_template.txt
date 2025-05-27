@@ -1,5 +1,5 @@
 # Your openai api key. (required)
-OPENAI_API_KEY=sk-xxxx
+OPENAI_API_KEY=sk-0loYDoRNfu1dRYJZZe1BsC9vAI1WyrHlnBHxDaaPENePb2Hn
 
 # DeepSeek Api Key. (Optional)
 DEEPSEEK_API_KEY=
@@ -28,7 +28,7 @@ GOOGLE_URL=
 # Override openai api request base url. (optional)
 # Default: https://api.openai.com
 # Examples: http://your-openai-proxy.com
-BASE_URL=
+BASE_URL=https://api.deepbricks.ai
 
 # Specify OpenAI organization ID.(optional)
 # Default: Empty

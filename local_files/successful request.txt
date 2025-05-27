@@ -1,0 +1,74 @@
+Request URL
+https://openrouter.ai/api/v1/chat/completions
+Request Method
+POST
+Status Code
+200 OK
+Remote Address
+127.0.0.1:7890
+Referrer Policy
+strict-origin-when-cross-origin
+access-control-allow-origin
+*
+cf-ray
+945bd608d822f7ed-PDX
+content-encoding
+br
+content-type
+application/json
+date
+Mon, 26 May 2025 08:17:26 GMT
+server
+cloudflare
+vary
+Accept-Encoding
+x-clerk-auth-message
+Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)
+x-clerk-auth-reason
+token-invalid
+x-clerk-auth-status
+signed-out
+:authority
+openrouter.ai
+:method
+POST
+:path
+/api/v1/chat/completions
+:scheme
+https
+accept
+*/*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+authorization
+Bearer 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
+content-length
+132
+content-type
+application/json
+http-referer
+http://127.0.0.1:5501
+origin
+http://127.0.0.1:5501
+priority
+u=1, i
+referer
+http://127.0.0.1:5501/
+sec-ch-ua
+"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+cross-site
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+x-title
+OpenRouter Test
