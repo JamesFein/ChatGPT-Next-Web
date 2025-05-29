@@ -283,7 +283,14 @@ export function getMessageImages(message: RequestMessage): string[] {
 export function isVisionModel(model: string) {
   const visionModels = useAccessStore.getState().visionModels;
   const envVisionModels = visionModels?.split(",").map((m) => m.trim());
-  if (envVisionModels?.includes(model)) {
+  const additionalVisionModels = [
+    "google/gemini-2.5-pro-preview",
+    "anthropic/claude-sonnet-4",
+  ];
+  if (
+    envVisionModels?.includes(model) ||
+    additionalVisionModels.includes(model)
+  ) {
     return true;
   }
   return (
