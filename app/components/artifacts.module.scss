@@ -1,31 +1,75 @@
+/* Artifacts 组件样式 */
+/* 保持与全局样式一致，使用全局变量和注释风格 */
+
 .artifacts {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  border: var(--border-in-light);
+  padding: 24px 28px;
+  margin: 24px auto;
+  max-width: 900px;
   display: flex;
-  width: 100%;
-  height: 100%;
   flex-direction: column;
-  &-header {
-    display: flex;
-    align-items: center;
-    height: 36px;
-    padding: 20px;
-    background: var(--second);
-  }
-  &-title {
-    flex: 1;
-    text-align: center;
-    font-weight: bold;
-    font-size: 24px;
-  }
-  &-content {
-    flex-grow: 1;
-    padding: 0 20px 20px 20px;
-    background-color: var(--second);
+  gap: 0;
+
+  /* 响应式适配 */
+  @media only screen and (max-width: 600px) {
+    padding: 16px 6px;
+    margin: 12px 0;
+    max-width: 100vw;
   }
 }
 
+/* 顶部栏 */
+.artifacts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: var(--border-in-light);
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+  min-height: 40px;
+}
+
+/* 标题 */
+.artifacts-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+/* 内容区 */
+.artifacts-content {
+  flex: 1 1 auto;
+  padding: 8px 0 0 0;
+  background: transparent;
+  overflow-y: auto;
+  min-height: 120px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* iframe 容器 */
 .artifacts-iframe {
   width: 100%;
+  min-height: 320px;
   border: var(--border-in-light);
-  border-radius: 6px;
-  background-color: var(--gray);
+  border-radius: 12px;
+  background: var(--gray);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: transparent;
+  }
 }
