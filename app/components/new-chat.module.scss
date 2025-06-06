@@ -75,6 +75,10 @@
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
 
     animation: slide-in ease 0.5s;
 
@@ -123,6 +127,18 @@
         height: 32px;
         min-width: 0;
       }
+        justify-content: center;
+        background-color: var(--gray);
+        flex-shrink: 0;
+      }
+
+      .mask-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 32px;
+        min-width: 0;
+      }
 
       .mask-name {
         margin-left: 10px;
@@ -145,6 +161,5 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-    }
   }
 }
