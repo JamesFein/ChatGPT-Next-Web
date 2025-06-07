@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Path, SlotID } from "../constant";
+import { useEffect, useRef } from "react";
+import { Path } from "../constant";
 import { IconButton } from "./button";
 import { EmojiAvatar } from "./emoji";
 import styles from "./new-chat.module.scss";
@@ -16,7 +16,6 @@ import { MaskAvatar } from "./mask";
 import { useCommand } from "../command";
 import { showConfirm } from "./ui-lib";
 import { BUILTIN_MASK_STORE } from "../masks";
-import clsx from "clsx";
 
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
@@ -25,61 +24,59 @@ function MaskItem(props: { mask: Mask; onClick?: () => void }) {
         avatar={props.mask.avatar}
         model={props.mask.modelConfig.model}
       />
-      <div className={clsx(styles["mask-name"], "one-line")}>
-        {props.mask.name}
-      </div>
+      <div className={styles["mask-name"]}>{props.mask.name}</div>
     </div>
   );
 }
 
-function useMaskGroup(masks: Mask[]) {
-  const [groups, setGroups] = useState<Mask[][]>([]);
+// function useMaskGroup(masks: Mask[]) {
+//   const [groups, setGroups] = useState<Mask[][]>([]);
 
-  useEffect(() => {
-    const computeGroup = () => {
-      const appBody = document.getElementById(SlotID.AppBody);
-      if (!appBody || masks.length === 0) return;
+//   useEffect(() => {
+//     const computeGroup = () => {
+//       const appBody = document.getElementById(SlotID.AppBody);
+//       if (!appBody || masks.length === 0) return;
 
-      const rect = appBody.getBoundingClientRect();
-      const maxWidth = rect.width;
-      const maxHeight = rect.height * 0.6;
-      const maskItemWidth = 120;
-      const maskItemHeight = 50;
+//       const rect = appBody.getBoundingClientRect();
+//       const maxWidth = rect.width;
+//       const maxHeight = rect.height * 0.6;
+//       const maskItemWidth = 120;
+//       const maskItemHeight = 50;
 
-      const randomMask = () => masks[Math.floor(Math.random() * masks.length)];
-      let maskIndex = 0;
-      const nextMask = () => masks[maskIndex++ % masks.length];
+//       const randomMask = () => masks[Math.floor(Math.random() * masks.length)];
+//       let maskIndex = 0;
+//       const nextMask = () => masks[maskIndex++ % masks.length];
 
-      const rows = Math.ceil(maxHeight / maskItemHeight);
-      const cols = Math.ceil(maxWidth / maskItemWidth);
+//       const rows = Math.ceil(maxHeight / maskItemHeight);
+//       const cols = Math.ceil(maxWidth / maskItemWidth);
 
-      const newGroups = new Array(rows)
-        .fill(0)
-        .map((_, _i) =>
-          new Array(cols)
-            .fill(0)
-            .map((_, j) => (j < 1 || j > cols - 2 ? randomMask() : nextMask())),
-        );
+//       const newGroups = new Array(rows)
+//         .fill(0)
+//         .map((_, _i) =>
+//           new Array(cols)
+//             .fill(0)
+//             .map((_, j) => (j < 1 || j > cols - 2 ? randomMask() : nextMask())),
+//         );
 
-      setGroups(newGroups);
-    };
+//       setGroups(newGroups);
+//     };
 
-    computeGroup();
+//     computeGroup();
 
-    window.addEventListener("resize", computeGroup);
-    return () => window.removeEventListener("resize", computeGroup);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+//     window.addEventListener("resize", computeGroup);
+//     return () => window.removeEventListener("resize", computeGroup);
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, []);
 
-  return groups;
-}
+//   return groups;
+// }
 
 export function NewChat() {
   const chatStore = useChatStore();
   const maskStore = useMaskStore();
 
   const masks = maskStore.getAll();
-  const groups = useMaskGroup(masks);
+  // const groups = useMaskGroup(masks); // 注释掉
 
   const navigate = useNavigate();
   const config = useAppConfig();
@@ -111,7 +108,7 @@ export function NewChat() {
       maskRef.current.scrollLeft =
         (maskRef.current.scrollWidth - maskRef.current.clientWidth) / 2;
     }
-  }, [groups]);
+  }, [masks]);
 
   return (
     <div className={styles["new-chat"]}>
@@ -170,16 +167,8 @@ export function NewChat() {
       </div>
 
       <div className={styles["masks"]} ref={maskRef}>
-        {groups.map((masks, i) => (
-          <div key={i} className={styles["mask-row"]}>
-            {masks.map((mask, index) => (
-              <MaskItem
-                key={index}
-                mask={mask}
-                onClick={() => startChat(mask)}
-              />
-            ))}
-          </div>
+        {masks.map((mask, index) => (
+          <MaskItem key={mask.id} mask={mask} onClick={() => startChat(mask)} />
         ))}
       </div>
     </div>
