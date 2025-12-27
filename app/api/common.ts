@@ -6,7 +6,10 @@ import { getModelProvider, isModelNotavailableInServer } from "../utils/model";
 
 const serverConfig = getServerSideConfig();
 
-export async function requestOpenai(req: NextRequest) {
+export async function requestOpenai(
+  req: NextRequest,
+  requestBodyStr?: string | null,
+) {
   const controller = new AbortController();
 
   const isAzure = req.nextUrl.pathname.includes("azure/deployments");
@@ -90,31 +93,15 @@ export async function requestOpenai(req: NextRequest) {
 
   const fetchUrl = cloudflareAIGatewayUrl(`${baseUrl}/${path}`);
   console.log("fetchUrl", fetchUrl);
-  const fetchOptions: RequestInit = {
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store",
-      [authHeaderName]: authValue,
-      ...(serverConfig.openaiOrgId && {
-        "OpenAI-Organization": serverConfig.openaiOrgId,
-      }),
-    },
-    method: req.method,
-    body: req.body,
-    // to fix #2485: https://stackoverflow.com/questions/55920957/cloudflare-worker-typeerror-one-time-use-body
-    redirect: "manual",
-    // @ts-ignore
-    duplex: "half",
-    signal: controller.signal,
-  };
+
+  let bodyToSend: string | ReadableStream<Uint8Array> | null =
+    requestBodyStr || req.body;
 
   // #1815 try to refuse gpt4 request
-  if (serverConfig.customModels && req.body) {
+  // If requestBodyStr is provided, it means body was already read and validated
+  if (serverConfig.customModels && requestBodyStr) {
     try {
-      const clonedBody = await req.text();
-      fetchOptions.body = clonedBody;
-
-      const jsonBody = JSON.parse(clonedBody) as { model?: string };
+      const jsonBody = JSON.parse(requestBodyStr) as { model?: string };
 
       // not undefined and is false
       if (
@@ -142,6 +129,24 @@ export async function requestOpenai(req: NextRequest) {
       console.error("[OpenAI] gpt4 filter", e);
     }
   }
+
+  const fetchOptions: RequestInit = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      [authHeaderName]: authValue,
+      ...(serverConfig.openaiOrgId && {
+        "OpenAI-Organization": serverConfig.openaiOrgId,
+      }),
+    },
+    method: req.method,
+    body: bodyToSend,
+    // to fix #2485: https://stackoverflow.com/questions/55920957/cloudflare-worker-typeerror-one-time-use-body
+    redirect: "manual",
+    // @ts-ignore
+    duplex: "half",
+    signal: controller.signal,
+  };
 
   try {
     const res = await fetch(fetchUrl, fetchOptions);

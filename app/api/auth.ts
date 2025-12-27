@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getServerSideConfig } from "../config/server";
 import md5 from "spark-md5";
 import { ACCESS_CODE_PREFIX, ModelProvider } from "../constant";
+import { estimateTokenLength } from "../utils/token";
 
 function getIP(req: NextRequest) {
   let ip = req.ip ?? req.headers.get("x-real-ip");
@@ -126,4 +127,77 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
   return {
     error: false,
   };
+}
+
+export interface ValidateInputTokensResult {
+  error: boolean;
+  msg?: string;
+  body?: string;
+}
+
+/**
+ * Validate that the input tokens do not exceed the configured maximum.
+ * Counts tokens in the messages array from the request body.
+ */
+export async function validateInputTokens(
+  req: NextRequest,
+): Promise<ValidateInputTokensResult> {
+  const serverConfig = getServerSideConfig();
+  const maxInputTokens = serverConfig.maxInputTokens;
+
+  if (!maxInputTokens || maxInputTokens <= 0) {
+    // No limit configured
+    return { error: false };
+  }
+
+  try {
+    const clonedBody = await req.text();
+    const jsonBody = JSON.parse(clonedBody) as {
+      messages?: Array<{ content?: string; role?: string }>;
+      system?: string;
+      prompt?: string;
+    };
+
+    let totalTokens = 0;
+
+    // Count tokens in system prompt if present
+    if (jsonBody.system) {
+      totalTokens += estimateTokenLength(jsonBody.system);
+    }
+
+    // Count tokens in each message
+    if (jsonBody.messages && Array.isArray(jsonBody.messages)) {
+      for (const message of jsonBody.messages) {
+        if (message.content) {
+          totalTokens += estimateTokenLength(message.content);
+        }
+      }
+    }
+
+    // For some APIs that use 'prompt' instead of messages
+    if (jsonBody.prompt && !jsonBody.messages) {
+      totalTokens += estimateTokenLength(jsonBody.prompt);
+    }
+
+    console.log(
+      `[Token Validation] Total input tokens: ${Math.ceil(
+        totalTokens,
+      )}, Max allowed: ${maxInputTokens}`,
+    );
+
+    if (Math.ceil(totalTokens) > maxInputTokens) {
+      return {
+        error: true,
+        msg: `Input tokens (${Math.ceil(
+          totalTokens,
+        )}) exceed the limit of ${maxInputTokens}`,
+      };
+    }
+
+    return { error: false, body: clonedBody };
+  } catch (e) {
+    console.error("[Token Validation] Error parsing request body:", e);
+    // If we can't parse, let it through (might be a valid request format issue)
+    return { error: false };
+  }
 }

@@ -1,5 +1,5 @@
 # Your openai api key. (required)
-OPENAI_API_KEY=sk-0loYDoRNfu1dRYJZZe1BsC9vAI1WyrHlnBHxDaaPENePb2Hn
+OPENAI_API_KEY=sk-xuMEjgV8HljTIArqsvb99SwJLIJd5x765WtIrJNtKMReftAE
 
 # DeepSeek Api Key. (Optional)
 DEEPSEEK_API_KEY=
@@ -28,7 +28,7 @@ GOOGLE_URL=
 # Override openai api request base url. (optional)
 # Default: https://api.openai.com
 # Examples: http://your-openai-proxy.com
-BASE_URL=https://api.deepbricks.ai
+BASE_URL=https://api.ssopen.top/v1
 
 # Specify OpenAI organization ID.(optional)
 # Default: Empty
@@ -57,7 +57,7 @@ DISABLE_FAST_LINK=
 # (optional)
 # Default: Empty
 # To control custom models, use + to add a custom model, use - to hide a model, use name=displayName to customize model name, separated by comma.
-CUSTOM_MODELS=
+CUSTOM_MODELS=gpt-5.2
 
 # (optional)
 # Default: Empty
@@ -81,3 +81,9 @@ SILICONFLOW_API_KEY=
 
 ### siliconflow Api url (optional)
 SILICONFLOW_URL=
+
+### Maximum input tokens allowed per request (optional)
+# Default: 30000
+# Set this to limit the maximum tokens in user input.
+# If user input exceeds this limit, the request will be rejected with an error.
+MAX_INPUT_TOKENS=30000

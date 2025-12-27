@@ -92,6 +92,8 @@ declare global {
       DEFAULT_INPUT_TEMPLATE?: string;
 
       ENABLE_MCP?: string; // enable mcp functionality
+
+      MAX_INPUT_TOKENS?: string; // maximum input tokens allowed per request
     }
   }
 }
@@ -265,5 +267,6 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+    maxInputTokens: parseInt(process.env.MAX_INPUT_TOKENS || "8000", 10),
   };
 };

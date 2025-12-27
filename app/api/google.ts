@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "./auth";
+import { auth, validateInputTokens } from "./auth";
 import { getServerSideConfig } from "@/app/config/server";
 import { ApiPath, GEMINI_BASE_URL, ModelProvider } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
@@ -21,6 +21,19 @@ export async function handle(
     return NextResponse.json(authResult, {
       status: 401,
     });
+  }
+
+  const tokenValidationResult = await validateInputTokens(req);
+  if (tokenValidationResult.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: tokenValidationResult.msg,
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   const bearToken =

@@ -8,7 +8,7 @@ import {
 } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "./auth";
+import { auth, validateInputTokens } from "./auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
 import { cloudflareAIGatewayUrl } from "@/app/utils/cloudflare";
 
@@ -46,8 +46,21 @@ export async function handle(
     });
   }
 
+  const tokenValidationResult = await validateInputTokens(req);
+  if (tokenValidationResult.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: tokenValidationResult.msg,
+      },
+      {
+        status: 400,
+      },
+    );
+  }
+
   try {
-    const response = await request(req);
+    const response = await request(req, tokenValidationResult.body || null);
     return response;
   } catch (e) {
     console.error("[Anthropic] ", e);
@@ -57,7 +70,7 @@ export async function handle(
 
 const serverConfig = getServerSideConfig();
 
-async function request(req: NextRequest) {
+async function request(req: NextRequest, requestBodyStr?: string | null) {
   const controller = new AbortController();
 
   let authHeaderName = "x-api-key";
@@ -105,7 +118,7 @@ async function request(req: NextRequest) {
         Anthropic.Vision,
     },
     method: req.method,
-    body: req.body,
+    body: requestBodyStr || req.body,
     redirect: "manual",
     // @ts-ignore
     duplex: "half",
@@ -113,12 +126,9 @@ async function request(req: NextRequest) {
   };
 
   // #1815 try to refuse some request to some models
-  if (serverConfig.customModels && req.body) {
+  if (serverConfig.customModels && requestBodyStr) {
     try {
-      const clonedBody = await req.text();
-      fetchOptions.body = clonedBody;
-
-      const jsonBody = JSON.parse(clonedBody) as { model?: string };
+      const jsonBody = JSON.parse(requestBodyStr) as { model?: string };
 
       // not undefined and is false
       if (

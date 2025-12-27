@@ -7,7 +7,7 @@ import {
 } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/app/api/auth";
+import { auth, validateInputTokens } from "@/app/api/auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
 
 const serverConfig = getServerSideConfig();
@@ -27,6 +27,19 @@ export async function handle(
     return NextResponse.json(authResult, {
       status: 401,
     });
+  }
+
+  const tokenValidationResult = await validateInputTokens(req);
+  if (tokenValidationResult.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: tokenValidationResult.msg,
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   try {

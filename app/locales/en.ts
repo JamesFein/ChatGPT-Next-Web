@@ -17,6 +17,8 @@ const en: LocaleType = {
      \ 2️⃣ Using a private setup? [Click here](/#/auth) to enter your key 🔑
      \ 3️⃣ Want to use your own OpenAI resources? [Click here](/#/settings) to change settings ⚙️
      `,
+    MaxInputTokens:
+      "Input tokens exceed the limit. Please reduce the length of your message or history.",
   },
   Auth: {
     Return: "Return",

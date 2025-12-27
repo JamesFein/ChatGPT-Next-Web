@@ -3,7 +3,7 @@ import { getServerSideConfig } from "@/app/config/server";
 import { ModelProvider, OpenaiPath } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "./auth";
+import { auth, validateInputTokens } from "./auth";
 import { requestOpenai } from "./common";
 
 const ALLOWED_PATH = new Set(Object.values(OpenaiPath));
@@ -58,8 +58,25 @@ export async function handle(
     });
   }
 
+  let requestBody: string | null = null;
+  const tokenValidationResult = await validateInputTokens(req);
+  if (tokenValidationResult.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        msg: tokenValidationResult.msg,
+      },
+      {
+        status: 400,
+      },
+    );
+  }
+
+  // Use the body returned from token validation (it was already read there)
+  requestBody = tokenValidationResult.body || null;
+
   try {
-    const response = await requestOpenai(req);
+    const response = await requestOpenai(req, requestBody);
 
     // list models
     if (subpath === OpenaiPath.ListModelPath && response.status === 200) {
