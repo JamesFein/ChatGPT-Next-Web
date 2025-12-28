@@ -150,7 +150,7 @@ export async function validateInputTokens(
     return { error: false };
   }
 
-  let clonedBody: string | null = null;
+  let clonedBody: string | undefined;
 
   try {
     clonedBody = await req.text();
