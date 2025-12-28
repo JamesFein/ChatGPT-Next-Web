@@ -54,7 +54,7 @@ export async function handle(
     );
   }
   try {
-    const response = await request(req, apiKey);
+    const response = await request(req, apiKey, tokenValidationResult.body);
     return response;
   } catch (e) {
     console.error("[Google] ", e);
@@ -81,7 +81,11 @@ export const preferredRegion = [
   "syd1",
 ];
 
-async function request(req: NextRequest, apiKey: string) {
+async function request(
+  req: NextRequest,
+  apiKey: string,
+  requestBodyStr?: string | null,
+) {
   const controller = new AbortController();
 
   let baseUrl = serverConfig.googleUrl || GEMINI_BASE_URL;
@@ -119,7 +123,7 @@ async function request(req: NextRequest, apiKey: string) {
         (req.headers.get("Authorization") ?? "").replace("Bearer ", ""),
     },
     method: req.method,
-    body: req.body,
+    body: requestBodyStr || req.body,
     // to fix #2485: https://stackoverflow.com/questions/55920957/cloudflare-worker-typeerror-one-time-use-body
     redirect: "manual",
     // @ts-ignore

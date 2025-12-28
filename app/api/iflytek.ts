@@ -44,7 +44,7 @@ export async function handle(
   }
 
   try {
-    const response = await request(req);
+    const response = await request(req, tokenValidationResult.body);
     return response;
   } catch (e) {
     console.error("[Iflytek] ", e);
@@ -52,7 +52,7 @@ export async function handle(
   }
 }
 
-async function request(req: NextRequest) {
+async function request(req: NextRequest, requestBodyStr?: string | null) {
   const controller = new AbortController();
 
   // iflytek use base url or just remove the path
@@ -85,7 +85,7 @@ async function request(req: NextRequest) {
       Authorization: req.headers.get("Authorization") ?? "",
     },
     method: req.method,
-    body: req.body,
+    body: requestBodyStr || req.body,
     redirect: "manual",
     // @ts-ignore
     duplex: "half",
@@ -93,12 +93,9 @@ async function request(req: NextRequest) {
   };
 
   // try to refuse some request to some models
-  if (serverConfig.customModels && req.body) {
+  if (serverConfig.customModels && requestBodyStr) {
     try {
-      const clonedBody = await req.text();
-      fetchOptions.body = clonedBody;
-
-      const jsonBody = JSON.parse(clonedBody) as { model?: string };
+      const jsonBody = JSON.parse(requestBodyStr) as { model?: string };
 
       // not undefined and is false
       if (

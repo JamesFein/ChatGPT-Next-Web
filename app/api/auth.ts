@@ -150,8 +150,10 @@ export async function validateInputTokens(
     return { error: false };
   }
 
+  let clonedBody: string | null = null;
+
   try {
-    const clonedBody = await req.text();
+    clonedBody = await req.text();
     const jsonBody = JSON.parse(clonedBody) as {
       messages?: Array<{ content?: string; role?: string }>;
       system?: string;
@@ -191,13 +193,15 @@ export async function validateInputTokens(
         msg: `Input tokens (${Math.ceil(
           totalTokens,
         )}) exceed the limit of ${maxInputTokens}`,
+        body: clonedBody,
       };
     }
 
     return { error: false, body: clonedBody };
   } catch (e) {
     console.error("[Token Validation] Error parsing request body:", e);
-    // If we can't parse, let it through (might be a valid request format issue)
-    return { error: false };
+    // Always return the body we read, even if parsing failed
+    // This prevents ReadableStream from being disturbed on retry
+    return { error: false, body: clonedBody };
   }
 }
