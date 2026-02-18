@@ -8,6 +8,7 @@ import { useAllModels } from "../utils/hooks";
 import { groupBy } from "lodash-es";
 import styles from "./model-config.module.scss";
 import { getModelProvider } from "../utils/model";
+import { useAccessStore } from "../store/access";
 
 export function ModelConfigList(props: {
   modelConfig: ModelConfig;
@@ -20,6 +21,7 @@ export function ModelConfigList(props: {
   );
   const value = `${props.modelConfig.model}@${props.modelConfig?.providerName}`;
   const compressModelValue = `${props.modelConfig.compressModel}@${props.modelConfig?.compressProviderName}`;
+  const envCompressModel = useAccessStore.getState().defaultCompressModel;
 
   return (
     <>
@@ -243,12 +245,17 @@ export function ModelConfigList(props: {
       </ListItem>
       <ListItem
         title={Locale.Settings.CompressModel.Title}
-        subTitle={Locale.Settings.CompressModel.SubTitle}
+        subTitle={
+          envCompressModel
+            ? `${Locale.Settings.CompressModel.SubTitle} (${Locale.Settings.CompressModel.Override}: ${envCompressModel})`
+            : Locale.Settings.CompressModel.SubTitle
+        }
       >
         <Select
           className={styles["select-compress-model"]}
           aria-label={Locale.Settings.CompressModel.Title}
-          value={compressModelValue}
+          value={envCompressModel || compressModelValue}
+          disabled={!!envCompressModel}
           onChange={(e) => {
             const [model, providerName] = getModelProvider(
               e.currentTarget.value,

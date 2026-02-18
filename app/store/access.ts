@@ -140,6 +140,7 @@ const DEFAULT_ACCESS_STATE = {
   disableFastLink: false,
   customModels: "",
   defaultModel: "",
+  defaultCompressModel: "",
   visionModels: "",
 
   // tts config

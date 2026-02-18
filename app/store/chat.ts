@@ -34,7 +34,10 @@ import { createPersistStore } from "../utils/store";
 import { estimateTokenLength } from "../utils/token";
 import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { useAccessStore } from "./access";
-import { collectModelsWithDefaultModel } from "../utils/model";
+import {
+  collectModelsWithDefaultModel,
+  getModelProvider,
+} from "../utils/model";
 import { createEmptyMask, Mask } from "./mask";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
@@ -670,13 +673,26 @@ export const useChatStore = createPersistStore(
           return;
         }
 
-        // if not config compressModel, then using getSummarizeModel
-        const [model, providerName] = modelConfig.compressModel
-          ? [modelConfig.compressModel, modelConfig.compressProviderName]
-          : getSummarizeModel(
-              session.mask.modelConfig.model,
-              session.mask.modelConfig.providerName,
-            );
+        // Priority: env DEFAULT_COMPRESS_MODEL > user/mask compressModel > auto getSummarizeModel
+        const accessStore = useAccessStore.getState();
+        const envCompressModel = accessStore.defaultCompressModel;
+
+        let model: string, providerName: string;
+        if (envCompressModel) {
+          const [m, p] = getModelProvider(envCompressModel);
+          model = m;
+          providerName = p ?? "";
+        } else if (modelConfig.compressModel) {
+          [model, providerName] = [
+            modelConfig.compressModel,
+            modelConfig.compressProviderName,
+          ];
+        } else {
+          [model, providerName] = getSummarizeModel(
+            session.mask.modelConfig.model,
+            session.mask.modelConfig.providerName,
+          );
+        }
         const api: ClientApi = getClientApi(providerName as ServiceProvider);
 
         // remove error messages if any

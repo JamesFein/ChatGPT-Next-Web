@@ -545,6 +545,7 @@ const cn = {
     CompressModel: {
       Title: "对话摘要模型",
       SubTitle: "用于压缩历史记录、生成对话标题的模型",
+      Override: "已由服务端配置覆盖",
     },
     Temperature: {
       Title: "随机性 (temperature)",
